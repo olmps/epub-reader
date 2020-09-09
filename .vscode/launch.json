@@ -1,0 +1,11 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug epub_reader example",
+      "type": "dart",
+      "request": "launch",
+      "program": "examples/epub_reader/lib/main.dart"
+    }
+  ]
+}
