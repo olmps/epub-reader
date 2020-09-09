@@ -1,0 +1,25 @@
+name: epub_parser
+description: Parser for .epub extensions
+version: 0.0.1
+author: Olympus
+homepage: https://olmps.co
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Helper for finding common directories on all mobile systems
+  path_provider: 1.6.11
+
+  # Create and extracted ZIP files
+  flutter_archive: ^1.0.2
+
+  # XML files parser
+  xml: ^3.6.1
+
+dev_dependencies:
+  # Mocks for unit testing
+  mockito: 4.1.1

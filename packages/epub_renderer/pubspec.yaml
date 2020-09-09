@@ -1,0 +1,28 @@
+name: epub_renderer
+description: A superset of the epub_parser that renders the epubs through unopinionated widgets
+version: 1.0.0
+author: Olympus Software
+homepage: https://olmps.co
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Webview support
+  webview_flutter: ^0.3.20+2
+
+  # Plugin for playing audio files
+  just_audio: ^0.3.3
+
+  epub_parser:
+    path: ../epub_parser
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Mocks for unit testing
+  mockito: 4.1.1
