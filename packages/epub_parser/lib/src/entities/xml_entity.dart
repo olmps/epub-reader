@@ -7,36 +7,35 @@ import 'package:xml/xml.dart' as XML;
 /// Encapsulates a XML file and exposes auxiliary functions to easily navigate
 /// through the XML file tags.
 class XMLEntity {
-  String filePath;
+  String path;
 
   /// XML navigation tree. It indicates the tag that the current entity
   /// represents.
   /// As an example, it may be: `root/child1/list/5/finalElement`,
   /// which indicates that the current entity represents the nsted `finalElement`
   /// tag, which can be found by following the path `oot/child1/list/5`
-  String _treePath = "";
+  String _treePath = '';
 
   /// XML root document
   XML.XmlDocument _rootDocument;
 
-  XMLEntity(this.filePath);
+  XMLEntity(this.path);
 
   XMLEntity._(this._rootDocument, this._treePath);
 
-  load() async {
-    final localFile = File(filePath);
+  Future<void> load() async {
+    final localFile = File(path);
 
     try {
-      String fileContent = await localFile.readAsString();
+      final fileContent = await localFile.readAsString();
       _rootDocument = XML.parse(fileContent);
     } catch (error) {
-      throw error;
+      rethrow;
     }
   }
 
   XMLEntity operator [](String tag) {
-    if (_treePath.isNotEmpty)
-      return XMLEntity._(_rootDocument, "$_treePath/$tag");
+    if (_treePath.isNotEmpty) return XMLEntity._(_rootDocument, "$_treePath/$tag");
     return XMLEntity._(_rootDocument, tag);
   }
 
@@ -62,10 +61,10 @@ class XMLEntity {
   }
 
   /// Returns a list of all children tags from current entity
-  /// 
+  ///
   /// Example: `xmlEntity["tag"].all()` will return all children entities from `tag`.
   /// Considering the following XML structure:
-  /// 
+  ///
   /// <a>
   ///   <b/>
   ///   <c/>
@@ -80,15 +79,12 @@ class XMLEntity {
 
     // `children` elements returns not only XML tags, but also XML comments.
     // That's why we filter by `Element` type.
-    final nodeChilds = nestedElement.children
-        .toList()
-        .where((element) => element.nodeType == XML.XmlNodeType.ELEMENT);
+    final nodeChilds = nestedElement.children.toList().where((element) => element.nodeType == XML.XmlNodeType.ELEMENT);
 
     nodeChilds.toList().forEach((element) {
       var xmlElement = element as XML.XmlElement;
       var formattedIndex = nodeChilds.length > 1 ? "/${index.toString()}" : "";
-      allElements.add(XMLEntity._(
-          _rootDocument, "$_treePath/${xmlElement.name.local}$formattedIndex"));
+      allElements.add(XMLEntity._(_rootDocument, "$_treePath/${xmlElement.name.local}$formattedIndex"));
       index += 1;
     });
 
@@ -96,7 +92,7 @@ class XMLEntity {
   }
 
   /// Returns a list of all children tags filtered by `tag` name.
-  /// 
+  ///
   /// Similar to `.all()`, it return all children tags but filtering them by
   /// the tags name.
   List<XMLEntity> allOfTag(String tag) {
@@ -104,17 +100,14 @@ class XMLEntity {
     var allElements = List<XMLEntity>();
     var index = 0;
 
-    final nodeChilds = nestedElement.children
-        .where((element) => element.nodeType == XML.XmlNodeType.ELEMENT)
-        .toList();
+    final nodeChilds = nestedElement.children.where((element) => element.nodeType == XML.XmlNodeType.ELEMENT).toList();
     for (var element in nodeChilds) {
       var xmlElement = element as XML.XmlElement;
       if (xmlElement.name.local != tag) {
         continue;
       }
       var formattedIndex = "/${index.toString()}";
-      allElements
-          .add(XMLEntity._(_rootDocument, "$_treePath/$tag$formattedIndex"));
+      allElements.add(XMLEntity._(_rootDocument, "$_treePath/$tag$formattedIndex"));
       index += 1;
     }
 
@@ -127,7 +120,7 @@ class XMLEntity {
   }
 
   /// Get the tag represented by `_threePath`.
-  /// 
+  ///
   /// Iterates through the XML tree to find the element which is represented
   /// by `_threePath`.
   XML.XmlElement _nestedElement() {
@@ -148,9 +141,7 @@ class XMLEntity {
         final index = int.tryParse(splitPath[++i]);
         if (index == null) throw "This is not a single child element";
 
-        final nodeChilds = pathChilds
-            .where((element) => element.nodeType == XML.XmlNodeType.ELEMENT)
-            .toList();
+        final nodeChilds = pathChilds.where((element) => element.nodeType == XML.XmlNodeType.ELEMENT).toList();
         currentElement = nodeChilds[index];
       } else {
         currentElement = pathChilds.first;

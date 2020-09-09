@@ -17,30 +17,30 @@ class AudioPlayer {
 
   AudioPlayer(this._filePath, this._beginMilliseconds, this._durationInMilliseconds, this._onFinish);
 
-  schedule() {
+  void schedule() {
     _scheduledAudioPlay = Timer(
       Duration(milliseconds: _beginMilliseconds),
       () async {
         await _player.setFilePath(_filePath);
-        _player.seek(Duration(milliseconds: _beginMilliseconds));
-        _player.play();
+        await _player.seek(Duration(milliseconds: _beginMilliseconds));
+        await _player.play();
         _scheduleAudioFinish();
       },
     );
   }
 
-  _scheduleAudioFinish() {
+  void _scheduleAudioFinish() {
     _scheduledAudioStop = Timer(
       Duration(milliseconds: _durationInMilliseconds),
-      () {
-        _player.stop();
+      () async {
+        await _player.stop();
         _onFinish();
       },
     );
   }
 
-  cancel() {
-    _player.stop();
+  Future<void> cancel() async {
+    await _player.stop();
     _scheduledAudioPlay.cancel();
     _scheduledAudioStop.cancel();
   }

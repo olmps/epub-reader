@@ -1,13 +1,13 @@
-import 'dart:convert';
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:epub_parser/epub_parser.dart';
 
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import 'utilities/time_formatter.dart';
 import 'audio_player.dart';
+import 'utilities/time_formatter.dart';
 
 typedef OnPageMediaFinish = Function();
 
@@ -17,7 +17,7 @@ class BookPage extends StatefulWidget {
   final bool _shouldPlayAudio;
   final OnPageMediaFinish _onFinish;
 
-  BookPage(this._chapter, this._highlightClassName, this._shouldPlayAudio, [this._onFinish]);
+  const BookPage(this._chapter, this._highlightClassName, this._shouldPlayAudio, [this._onFinish]);
 
   @override
   State<StatefulWidget> createState() => _BookPageState();
@@ -46,8 +46,7 @@ class _BookPageState extends State<BookPage> {
   /// Injects CSS code to centralize the page content in the middle of the screen.
   /// Also injects the Javascript content to highlight and unhighlight labels
   String get _formattedChapterContent {
-    String content = widget._chapter.chapterContent;
-    final centeredContent = """
+    const centeredContent = '''
       <style> body, html { height: 100%;
                            width: 100%;
                            display: flex;
@@ -56,8 +55,8 @@ class _BookPageState extends State<BookPage> {
                            overflow: scroll;
                          }
       </style>
-    """;
-    final highlightScript = """
+    ''';
+    const highlightScript = '''
     <script>
       function highlight(elm, className) {
         if (typeof className !== 'undefined') {
@@ -75,10 +74,13 @@ class _BookPageState extends State<BookPage> {
         } 
       }
     </script>
-    """;
+    ''';
 
-    content = content.replaceAllMapped("<head>", (match) => "${match.group(0)} $centeredContent $highlightScript");
-    return content;
+    // TODO: is it only the first or all?
+    return widget._chapter.chapterContent.replaceAllMapped(
+      '<head>',
+      (match) => '${match.group(0)} $centeredContent $highlightScript',
+    );
   }
 
   /// Setup media events from the current ebook page
@@ -86,7 +88,7 @@ class _BookPageState extends State<BookPage> {
   /// Media events may be audio play and text highlights.
   /// These media events may happen sequentially and/or in
   /// parallel.
-  _setupMediaEvents() async {
+  Future<void> _setupMediaEvents() async {
     if (widget._chapter.smil == null) return;
 
     for (var event in widget._chapter.smil.events) {
@@ -102,10 +104,9 @@ class _BookPageState extends State<BookPage> {
           _playingAudiosAmount -= 1;
           // If there are no audio media running, the page finished all it's media content
           if (_playingAudiosAmount == 0) widget._onFinish();
-        });
-
-        // Schedule the media audio to be played on the correct time (according to `audioBegin` timestamp)
-        audioPlayer.schedule();
+        })
+          // Schedule the media audio to be played on the correct time (according to `audioBegin` timestamp)
+          ..schedule();
 
         _audioPlayers.add(audioPlayer);
       }

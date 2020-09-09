@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 import 'xml_entity.dart';
 
 class SmilEvent {
@@ -13,55 +15,51 @@ class SmilEvent {
   SmilEvent([this.highlightedLabelId, this.audioFilePath, this.audioBeginTimestamp, this.audioEndTimestamp]);
 }
 
+@immutable
 class Smil {
-  String _smilFilePath;
-  XMLEntity _smilFile;
+  final String path;
+  final List<SmilEvent> events;
+  final XMLEntity raw;
 
-  String get _smilRootDirectory => _smilFilePath.substring(0, this._smilFilePath.lastIndexOf("/"));
+  const Smil._raw({@required this.path, @required this.events, @required this.raw});
 
-  List<SmilEvent> events = [];
-
-  Smil(this._smilFilePath);
-
-  load() async {
+  static Future<Smil> fromFilePath(String path) async {
     try {
-      _smilFile = XMLEntity(this._smilFilePath);
-      await _smilFile.load();
-      await _loadContent();
+      final xmlRepresentation = XMLEntity(path);
+      await xmlRepresentation.load();
+
+      final events = <SmilEvent>[];
+
+      // Root pairs
+      final rootPairs = xmlRepresentation['body'].allOfTag('par');
+      events.addAll(rootPairs.map(_parsePairToEvent));
+
+      // Sequence pairs
+      final sequencePairs = xmlRepresentation['body'].allOfTag('seq');
+      final flattenedSequencePairs = sequencePairs.map((e) => e.allOfTag('par')).expand((element) => element);
+      events.addAll(flattenedSequencePairs.map(_parsePairToEvent));
+
+      return Smil._raw(path: path, events: events, raw: xmlRepresentation);
     } catch (error) {
-      throw error;
+      // TODO: manage error
+      rethrow;
     }
   }
+}
 
-  _loadContent() async {
-    final sequencies = _smilFile["body"].allOfTag("seq");
+SmilEvent _parsePairToEvent(XMLEntity pair) {
+  final textSmilAttributes = pair['text'].attributes();
+  final audioSmilAttributes = pair['audio'].attributes();
 
-    for (var sequence in sequencies) {
-      final sequencePairs = sequence.allOfTag("par");
-      for (var pair in sequencePairs) {
-        await _loadContentFromPair(pair);
-      }
-    }
+  var textSrc = textSmilAttributes['src'];
+  textSrc = textSrc.substring(textSrc.lastIndexOf('#') + 1, textSrc.length);
 
-    final rootPairs = _smilFile["body"].allOfTag("par");
+  final rootDir = pair.path.substring(0, pair.path.lastIndexOf('/'));
+  final audioSrc = audioSmilAttributes['src'];
+  final audioAbsolutePath = '$rootDir/$audioSrc';
 
-    for (var pair in rootPairs) {
-      await _loadContentFromPair(pair);
-    }
-  }
+  final audioBeginTimestamp = audioSmilAttributes['clipBegin'];
+  final audioEndTimestamp = audioSmilAttributes['clipEnd'];
 
-  _loadContentFromPair(XMLEntity pair) {
-    final textSmilAttributes = pair["text"].attributes();
-    final audioSmilAttributes = pair["audio"].attributes();
-
-    var textIdentifier = textSmilAttributes["src"];
-    textIdentifier = textIdentifier.substring(textIdentifier.lastIndexOf("#") + 1, textIdentifier.length);
-
-    final audioAbsolutePath = "${this._smilRootDirectory}/${audioSmilAttributes["src"]}";
-    final audioBeginTimestamp = audioSmilAttributes["clipBegin"];
-    final audioEndTimestamp = audioSmilAttributes["clipEnd"];
-
-    final smilEvent = SmilEvent(textIdentifier, audioAbsolutePath, audioBeginTimestamp, audioEndTimestamp);
-    this.events.add(smilEvent);
-  }
+  return SmilEvent(textSrc, audioAbsolutePath, audioBeginTimestamp, audioEndTimestamp);
 }

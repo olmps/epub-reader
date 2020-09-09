@@ -5,12 +5,13 @@ import 'package:flutter/rendering.dart';
 
 import 'book_page.dart';
 
+@immutable
 class EpubRenderer extends StatefulWidget {
   final String _filePath;
   final bool isAudioEnabled;
   final bool isAutoReadEnabled;
 
-  EpubRenderer(this._filePath, {this.isAudioEnabled = true, this.isAutoReadEnabled = true});
+  const EpubRenderer(this._filePath, {this.isAudioEnabled = true, this.isAutoReadEnabled = true});
 
   @override
   _EpubRendererState createState() {
@@ -33,8 +34,8 @@ class _EpubRendererState extends State<EpubRenderer> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('Loading ePub, please wait'),
-          SizedBox(height: 20),
+          const Text('Loading ePub, please wait'),
+          const SizedBox(height: 20),
           LinearProgressIndicator(
             backgroundColor: Colors.grey,
             valueColor: AlwaysStoppedAnimation<Color>(Colors.green),

@@ -31,8 +31,10 @@ class EpubParser {
 
   // Static
   /// Indicates the root path of all ebook resources
-  static String get _resourcesDirectoryPath =>
-      _rootContentFile.filePath.substring(0, _rootContentFile.filePath.lastIndexOf('/'));
+  static String get _resourcesDirectoryPath => _rootContentFile.path.substring(
+        0,
+        _rootContentFile.path.lastIndexOf('/'),
+      );
 
   /// Parse epub saved at `path`.
   ///
@@ -221,8 +223,7 @@ class EpubParser {
     if (smilIdentifier != null) {
       final smilResource = _resources[smilIdentifier];
       final smilAbsolutePath = "$_resourcesDirectoryPath/${smilResource.href}";
-      chapterSmil = Smil(smilAbsolutePath);
-      await chapterSmil.load();
+      chapterSmil = await Smil.fromFilePath(smilAbsolutePath);
     }
 
     return chapterSmil;
