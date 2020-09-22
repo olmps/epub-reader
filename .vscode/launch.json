@@ -2,10 +2,18 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug epub_reader example",
+      "name": "Debug epub_reader2 example",
       "type": "dart",
       "request": "launch",
-      "program": "examples/epub_reader/lib/main.dart"
+      "flutterMode": "debug",
+      "program": "examples/epub_reader2/lib/main.dart"
+    },
+    {
+      "name": "Profile epub_reader2 example",
+      "type": "dart",
+      "request": "launch",
+      "flutterMode": "profile",
+      "program": "examples/epub_reader2/lib/main.dart"
     }
   ]
 }

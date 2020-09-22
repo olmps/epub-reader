@@ -5,7 +5,7 @@ author: Olympus Software
 homepage: https://olmps.co
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.9.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -14,8 +14,12 @@ dependencies:
   # Webview support
   webview_flutter: ^0.3.20+2
 
+  flutter_inappwebview:
+
   # Plugin for playing audio files
-  just_audio: ^0.3.3
+  just_audio: ^0.4.4
+
+  page_turn:
 
   epub_parser:
     path: ../epub_parser

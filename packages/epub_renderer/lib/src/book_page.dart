@@ -4,26 +4,35 @@ import 'dart:convert';
 import 'package:epub_parser/epub_parser.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'audio_player.dart';
 import 'utilities/time_formatter.dart';
 
-typedef OnPageMediaFinish = Function();
+typedef OnPageMediaFinish = void Function();
 
 class BookPage extends StatefulWidget {
   final Chapter _chapter;
   final String _highlightClassName;
   final bool _shouldPlayAudio;
-  final OnPageMediaFinish _onFinish;
+  final OnPageMediaFinish _onFinishMedia;
+  final void Function(InAppWebViewController controller) _onFinishScripts;
 
-  const BookPage(this._chapter, this._highlightClassName, this._shouldPlayAudio, [this._onFinish]);
+  const BookPage(
+    Key key,
+    this._chapter,
+    this._highlightClassName,
+    this._shouldPlayAudio,
+    this._onFinishMedia,
+    this._onFinishScripts,
+  ) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _BookPageState();
 }
 
-class _BookPageState extends State<BookPage> {
+class _BookPageState extends State<BookPage> with SingleTickerProviderStateMixin {
   WebViewController _controller;
   String _currentHighlightId;
 
@@ -88,7 +97,7 @@ class _BookPageState extends State<BookPage> {
   /// Media events may be audio play and text highlights.
   /// These media events may happen sequentially and/or in
   /// parallel.
-  Future<void> _setupMediaEvents() async {
+  void _setupMediaEvents() {
     if (widget._chapter.smil == null) return;
 
     for (var event in widget._chapter.smil.events) {
@@ -103,7 +112,7 @@ class _BookPageState extends State<BookPage> {
         final audioPlayer = AudioPlayer(filePath, audioBegin, audioDuration, () {
           _playingAudiosAmount -= 1;
           // If there are no audio media running, the page finished all it's media content
-          if (_playingAudiosAmount == 0) widget._onFinish();
+          if (_playingAudiosAmount == 0) widget._onFinishMedia();
         })
           // Schedule the media audio to be played on the correct time (according to `audioBegin` timestamp)
           ..schedule();
@@ -148,16 +157,20 @@ class _BookPageState extends State<BookPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WebView(
+    return InAppWebView(
       initialUrl: Uri.dataFromString(
         _formattedChapterContent,
         mimeType: 'text/html',
         encoding: Encoding.getByName('utf-8'),
       ).toString(),
-      javascriptMode: JavascriptMode.unrestricted,
-      onWebViewCreated: (controller) => _controller = controller,
-      onPageFinished: (_) => _setupMediaEvents(),
-      initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
+      initialOptions: InAppWebViewGroupOptions(
+        crossPlatform: InAppWebViewOptions(
+          debuggingEnabled: true,
+        ),
+      ),
+      onLoadStop: (controller, url) {
+        widget._onFinishScripts(controller);
+      },
     );
   }
 }
