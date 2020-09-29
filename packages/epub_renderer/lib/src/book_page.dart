@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:epub_parser/epub_parser.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+// import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'audio_player.dart';
@@ -17,7 +17,6 @@ class BookPage extends StatefulWidget {
   final String _highlightClassName;
   final bool _shouldPlayAudio;
   final OnPageMediaFinish _onFinishMedia;
-  final void Function(InAppWebViewController controller) _onFinishScripts;
 
   const BookPage(
     Key key,
@@ -25,7 +24,6 @@ class BookPage extends StatefulWidget {
     this._highlightClassName,
     this._shouldPlayAudio,
     this._onFinishMedia,
-    this._onFinishScripts,
   ) : super(key: key);
 
   @override
@@ -100,19 +98,20 @@ class _BookPageState extends State<BookPage> with SingleTickerProviderStateMixin
   void _setupMediaEvents() {
     if (widget._chapter.smil == null) return;
 
-    for (var event in widget._chapter.smil.events) {
+    for (final event in widget._chapter.smil.events) {
       if (event.hasAudio && widget._shouldPlayAudio) {
         // Increments the number of audios being played
         _playingAudiosAmount += 1;
 
         final filePath = event.audioFilePath;
         final audioBegin = parseISO8601ExtendedToMilliseconds(event.audioBeginTimestamp);
-        final audioDuration = parseISO8601ExtendedToMilliseconds(event.audioEndTimestamp);
 
-        final audioPlayer = AudioPlayer(filePath, audioBegin, audioDuration, () {
+        final audioPlayer = AudioPlayer(filePath, audioBegin, () {
           _playingAudiosAmount -= 1;
           // If there are no audio media running, the page finished all it's media content
-          if (_playingAudiosAmount == 0) widget._onFinishMedia();
+          if (_playingAudiosAmount == 0) {
+            widget._onFinishMedia();
+          }
         })
           // Schedule the media audio to be played on the correct time (according to `audioBegin` timestamp)
           ..schedule();
@@ -138,7 +137,7 @@ class _BookPageState extends State<BookPage> with SingleTickerProviderStateMixin
   /// If another label is already highlighted, it removes the highlight from it.
   /// Use injected `highlight` function to add the highlight class name of `widget._highlightClassName`
   /// to highlight the desired label. The className is defined by the ebook style files.
-  _highlight(String labelId) {
+  void _highlight(String labelId) {
     if (_currentHighlightId != null) {
       _removeHighlight(_currentHighlightId);
     }
@@ -150,27 +149,23 @@ class _BookPageState extends State<BookPage> with SingleTickerProviderStateMixin
   /// Removes the highlight from the label with identifier `labelId`
   ///
   /// Similar to `_highlight` function, but instead adding, it removes the highlight from the label
-  _removeHighlight(String labelId) {
+  void _removeHighlight(String labelId) {
     _controller.evaluateJavascript("undoHighlight('$labelId', '${widget._highlightClassName}')");
     _currentHighlightId = null;
   }
 
   @override
   Widget build(BuildContext context) {
-    return InAppWebView(
+    return WebView(
       initialUrl: Uri.dataFromString(
         _formattedChapterContent,
         mimeType: 'text/html',
         encoding: Encoding.getByName('utf-8'),
       ).toString(),
-      initialOptions: InAppWebViewGroupOptions(
-        crossPlatform: InAppWebViewOptions(
-          debuggingEnabled: true,
-        ),
-      ),
-      onLoadStop: (controller, url) {
-        widget._onFinishScripts(controller);
-      },
+      javascriptMode: JavascriptMode.unrestricted,
+      onWebViewCreated: (controller) => _controller = controller,
+      onPageFinished: (_) => _setupMediaEvents(),
+      initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
     );
   }
 }

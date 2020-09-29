@@ -25,7 +25,7 @@ class AppState extends State<App> {
     setState(() {
       _isLoadingEbook = true;
     });
-    final ebookBytes = await rootBundle.load('assets/book.epub');
+    final ebookBytes = await rootBundle.load('assets/elefante.epub');
     final tempPath = (await getTemporaryDirectory()).path;
     File epubFile = File("$tempPath/ebook.epub");
     epubFile.writeAsBytesSync(ebookBytes.buffer.asUint8List(ebookBytes.offsetInBytes, ebookBytes.lengthInBytes));
@@ -33,6 +33,10 @@ class AppState extends State<App> {
       _bookPath = "$tempPath/ebook.epub";
       _isEbookLoaded = true;
     });
+  }
+
+  void onEvent(ReaderEvent event, dynamic data) {
+    print('called event $event with data $data');
   }
 
   @override
@@ -50,9 +54,12 @@ class AppState extends State<App> {
       home: Scaffold(
         body: _isEbookLoaded
             ? EpubRenderer(
-                _bookPath,
+                epubFilePath: _bookPath,
+                epubUrl: 'https://prod-us.elefanteletrado.com.br/cdn/Content/cdn/books/barata_v9_20200403105808.epub',
+                apiKey: '4odruGhEJ8-m6aJtLbTvZEH8e0lcIJk-GpzO7jxe3Dk',
                 isAudioEnabled: true,
-                isAutoReadEnabled: false,
+                minReadTime: 1,
+                onEvent: onEvent,
               )
             : Container(),
       ),

@@ -1,37 +1,53 @@
 PODS:
+  - AEXML (4.6.0)
+  - audio_session (0.0.1):
+    - Flutter
+  - ELReader (0.6.2):
+    - AEXML
+    - SSZipArchive
+  - epub_renderer (0.0.1):
+    - ELReader
+    - Flutter
   - Flutter (1.0.0)
   - flutter_archive (0.0.1):
     - Flutter
     - ZIPFoundation (= 0.9.11)
-  - flutter_inappwebview (0.0.1):
-    - Flutter
   - just_audio (0.0.1):
     - Flutter
   - path_provider (0.0.1):
     - Flutter
+  - SSZipArchive (2.2.3)
   - webview_flutter (0.0.1):
     - Flutter
   - ZIPFoundation (0.9.11)
 
 DEPENDENCIES:
+  - audio_session (from `.symlinks/plugins/audio_session/ios`)
+  - epub_renderer (from `.symlinks/plugins/epub_renderer/ios`)
   - Flutter (from `Flutter`)
   - flutter_archive (from `.symlinks/plugins/flutter_archive/ios`)
-  - flutter_inappwebview (from `.symlinks/plugins/flutter_inappwebview/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - webview_flutter (from `.symlinks/plugins/webview_flutter/ios`)
 
 SPEC REPOS:
+  "git@github.com:elefanteletrado/CocoaPods-Specs.git":
+    - ELReader
+  https://github.com/CocoaPods/Specs.git:
+    - AEXML
+    - SSZipArchive
   trunk:
     - ZIPFoundation
 
 EXTERNAL SOURCES:
+  audio_session:
+    :path: ".symlinks/plugins/audio_session/ios"
+  epub_renderer:
+    :path: ".symlinks/plugins/epub_renderer/ios"
   Flutter:
     :path: Flutter
   flutter_archive:
     :path: ".symlinks/plugins/flutter_archive/ios"
-  flutter_inappwebview:
-    :path: ".symlinks/plugins/flutter_inappwebview/ios"
   just_audio:
     :path: ".symlinks/plugins/just_audio/ios"
   path_provider:
@@ -40,14 +56,18 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter/ios"
 
 SPEC CHECKSUMS:
+  AEXML: 2fbb73d8724797ed2cde888731e176fa4d44dd83
+  audio_session: 4f3e461722055d21515cf3261b64c973c062f345
+  ELReader: 3afb3ce29da97198971610e3f42a6bda7dd00197
+  epub_renderer: dd9aed47a6ab96f0465ab025e1c6db6ae8a8297b
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_archive: 47fe3c4d4c74c5fb58196c44d5e6369b37acd1dd
-  flutter_inappwebview: 69dfbac46157b336ffbec19ca6dfd4638c7bf189
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
+  SSZipArchive: 62d4947b08730e4cda640473b0066d209ff033c9
   webview_flutter: d2b4d6c66968ad042ad94cbb791f5b72b4678a96
   ZIPFoundation: b1f0de4eed33e74a676f76e12559ab6b75990197
 
-PODFILE CHECKSUM: fe0e1ee7f3d1f7d00b11b474b62dd62134535aea
+PODFILE CHECKSUM: d35040460f90778d2195afe0b9fd2978816bfe68
 
 COCOAPODS: 1.9.3

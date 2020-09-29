@@ -11,11 +11,10 @@ class AudioPlayer {
   OnAudioFinish _onFinish;
 
   Timer _scheduledAudioPlay;
-  Timer _scheduledAudioStop;
 
   JustAudio.AudioPlayer _player = JustAudio.AudioPlayer();
 
-  AudioPlayer(this._filePath, this._beginMilliseconds, this._durationInMilliseconds, this._onFinish);
+  AudioPlayer(this._filePath, this._beginMilliseconds, this._onFinish);
 
   void schedule() {
     _scheduledAudioPlay = Timer(
@@ -24,16 +23,6 @@ class AudioPlayer {
         await _player.setFilePath(_filePath);
         await _player.seek(Duration(milliseconds: _beginMilliseconds));
         await _player.play();
-        _scheduleAudioFinish();
-      },
-    );
-  }
-
-  void _scheduleAudioFinish() {
-    _scheduledAudioStop = Timer(
-      Duration(milliseconds: _durationInMilliseconds),
-      () async {
-        await _player.stop();
         _onFinish();
       },
     );
@@ -42,6 +31,5 @@ class AudioPlayer {
   Future<void> cancel() async {
     await _player.stop();
     _scheduledAudioPlay.cancel();
-    _scheduledAudioStop.cancel();
   }
 }

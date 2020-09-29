@@ -14,12 +14,11 @@ dependencies:
   # Webview support
   webview_flutter: ^0.3.20+2
 
-  flutter_inappwebview:
+  # flutter_inappwebview:
 
   # Plugin for playing audio files
   just_audio: ^0.4.4
 
-  page_turn:
 
   epub_parser:
     path: ../epub_parser
@@ -30,3 +29,9 @@ dev_dependencies:
 
   # Mocks for unit testing
   mockito: 4.1.1
+
+flutter:
+  plugin:
+    platforms:
+      ios:
+        pluginClass: EpubRendererPlugin

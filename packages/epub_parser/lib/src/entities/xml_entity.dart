@@ -21,7 +21,7 @@ class XMLEntity {
 
   XMLEntity(this.path);
 
-  XMLEntity._(this._rootDocument, this._treePath);
+  XMLEntity._(this.path, this._rootDocument, this._treePath);
 
   Future<void> load() async {
     final localFile = File(path);
@@ -35,8 +35,8 @@ class XMLEntity {
   }
 
   XMLEntity operator [](String tag) {
-    if (_treePath.isNotEmpty) return XMLEntity._(_rootDocument, "$_treePath/$tag");
-    return XMLEntity._(_rootDocument, tag);
+    if (_treePath.isNotEmpty) return XMLEntity._(path, _rootDocument, "$_treePath/$tag");
+    return XMLEntity._(path, _rootDocument, tag);
   }
 
   /// Returns all tag attributes
@@ -84,7 +84,7 @@ class XMLEntity {
     nodeChilds.toList().forEach((element) {
       var xmlElement = element as XML.XmlElement;
       var formattedIndex = nodeChilds.length > 1 ? "/${index.toString()}" : "";
-      allElements.add(XMLEntity._(_rootDocument, "$_treePath/${xmlElement.name.local}$formattedIndex"));
+      allElements.add(XMLEntity._(path, _rootDocument, "$_treePath/${xmlElement.name.local}$formattedIndex"));
       index += 1;
     });
 
@@ -107,7 +107,7 @@ class XMLEntity {
         continue;
       }
       var formattedIndex = "/${index.toString()}";
-      allElements.add(XMLEntity._(_rootDocument, "$_treePath/$tag$formattedIndex"));
+      allElements.add(XMLEntity._(path, _rootDocument, "$_treePath/$tag$formattedIndex"));
       index += 1;
     }
 

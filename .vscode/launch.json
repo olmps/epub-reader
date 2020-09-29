@@ -6,14 +6,14 @@
       "type": "dart",
       "request": "launch",
       "flutterMode": "debug",
-      "program": "examples/epub_reader2/lib/main.dart"
+      "program": "example/lib/main.dart"
     },
     {
       "name": "Profile epub_reader2 example",
       "type": "dart",
       "request": "launch",
       "flutterMode": "profile",
-      "program": "examples/epub_reader2/lib/main.dart"
+      "program": "example/lib/main.dart"
     }
   ]
 }
